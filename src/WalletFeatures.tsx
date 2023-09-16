@@ -195,17 +195,15 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
       <CardBody>
         <Heading size="md">Wallet Features</Heading>
         <Divider my={4} />
-        <Stack spacing={4} divider={<Divider />}>
-          <Section title="Native Token Balance">
+          <Stack>
             <Button
               onClick={fetchBalance}
-              colorScheme="blue"
+              colorScheme="purple"
               isLoading={loading === Features.FETCH_BALANCE}
             >
               Fetch Balance
             </Button>
             <Text fontSize="xl" color="black">{balance ? `${balance} MATIC` : "Balance not fetched"}</Text>
-          </Section>
           <Stack>
             <Button
               onClick={getAddress}
@@ -247,7 +245,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
             <Button
               mt={2}
               onClick={sendNativeToken}
-              colorScheme="blue"
+              colorScheme="purple"
               isLoading={loading === Features.SEND_NATIVE_TOKEN}
             >
               Send
@@ -299,7 +297,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
 
           <Stack title="Export Private Key">
 
-            <Button onClick={onOpen} colorScheme="blue" mt={4}>
+            <Button onClick={onOpen} colorScheme="purple" mt={4}>
               Export Account
             </Button>
             <Modal isOpen={isOpen} onClose={onClose} size="xl">
