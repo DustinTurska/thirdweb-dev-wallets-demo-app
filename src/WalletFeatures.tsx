@@ -45,6 +45,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
   const [amount, setAmount] = useState('');
   const [txStatus, setTxStatus] = useState('');
   const [balance, setBalance] = useState<string | null>(null);
+  const [typedDataDisplay, setTypedDataDisplay] = useState<any>(null);
   const wallet = user?.wallet;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const onResult = (result: any) => {
@@ -104,7 +105,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
     setLoading(Features.SIGN_MESSAGE);
     // You can override the RPC url to whatever endpoint you need
     const signer = await wallet?.getEthersJsSigner({
-      rpcEndpoint: "https://bsc.blockpi.network/v1/rpc/public",
+      rpcEndpoint: "https://mumbai.rpc.thirdweb.com",
     });
     console.log("await signer?.getChainId()", await signer?.getChainId());
     const signedMessage = await signer?.signMessage("hello world");
@@ -115,47 +116,74 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
     console.log("signedMessage", signedMessage);
   };
 
+  const dataToSign = {
+    domain: {
+      version: "1.0.0",
+      name: "thirdweb Embedded wallet services",
+      chainId: 80001,
+    },
+    types: {
+      Person: [
+        { name: "name", type: "string" },
+        { name: "wallet", type: "address" },
+      ],
+      Mail: [
+        { name: "from", type: "Person" },
+        { name: "to", type: "Person" },
+        { name: "contents", type: "string" },
+      ],
+    },
+    message: {
+      from: {
+        name: "catty.thirdweb.eth",
+        wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+      },
+      to: {
+        name: "jason.thirdweb.eth",
+        wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      },
+      contents: "Jason! Did you see thirdweb's new embedded wallets!",
+    },
+  };
+
+  const renderTypedDataDisplay = (data: typeof dataToSign) => {
+    return (
+      <Stack spacing={3}>
+        <Text mt={2} fontSize="lg" color="black"><strong>Domain:</strong></Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Version:</strong> {data.domain.version}</Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Name:</strong> {data.domain.name}</Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Chain Id:</strong> {data.domain.chainId}</Text>
+        <Divider />
+        <Text mt={2} fontSize="lg" color="black"><strong>Types:</strong></Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Person:</strong> Name (String), Wallet (Address)</Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Mail:</strong> From (Person), To (Person), Contents (String)</Text>
+        <Divider />
+        <Text mt={2} fontSize="lg" color="black"><strong>Message:</strong></Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>From:</strong> {data.message.from.name}</Text>
+        <Text mt={2} fontSize="sm" color="black">{data.message.from.wallet}</Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>To:</strong> {data.message.to.name}</Text>
+        <Text mt={2} fontSize="sm" color="black">{data.message.to.wallet}</Text>
+        <Text mt={2} fontSize="lg" color="black"><strong>Contents:</strong> {data.message.contents}</Text>
+      </Stack>
+    );
+  };
+
   const signTypedDataV4 = async () => {
     setLoading(Features.SIGN_TYPED_DATA);
-    // You can override the RPC url to whatever endpoint you need
-    const signer = await wallet?.getEthersJsSigner({
-      rpcEndpoint: "https://eth.llamarpc.com",
-    });
-    const signedTypedData = await signer?._signTypedData(
-      {
-        version: "1.0.0",
-        name: "Paper Embedded wallet demo",
-        chainId: 1,
-      },
-      {
-        Person: [
-          { name: "name", type: "string" },
-          { name: "wallet", type: "address" },
-        ],
-        Mail: [
-          { name: "from", type: "Person" },
-          { name: "to", type: "Person" },
-          { name: "contents", type: "string" },
-        ],
-      },
-      {
-        from: {
-          name: "Cow",
-          wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-        },
-        to: {
-          name: "Bob",
-          wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-        },
-        contents: "Hello, Bob!",
-      },
-    );
-    setLoading(null);
 
+    setTypedDataDisplay(JSON.stringify(dataToSign, null, 2));
+
+    const signer = await wallet?.getEthersJsSigner({
+      rpcEndpoint: "https://mumbai.rpc.thirdweb.com",
+    });
+
+    const signedTypedData = await signer?._signTypedData(dataToSign.domain, dataToSign.types, dataToSign.message);
+    setLoading(null);
     onResult({
       signedTypedData,
     });
   };
+
 
   const sendNativeToken = async () => {
     setLoading(Features.SEND_NATIVE_TOKEN);
@@ -272,7 +300,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
               </Button>
               <Code borderRadius={8} p={4} width="full">
                 {result?.signedMessage || (
-                  <Text color="gray.500" fontStyle="italic" size="sm">
+                  <Text color="black" fontStyle="italic" size="sm">
                     {PLACEHOLDER}
                   </Text>
                 )}
@@ -281,6 +309,7 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
           </Section>
 
           <Section title="Sign Typed Data (EIP712)">
+            {renderTypedDataDisplay(dataToSign)}
             <Stack>
               <Button
                 onClick={signTypedDataV4}
@@ -289,15 +318,24 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
               >
                 Sign Type Data (EIP712)
               </Button>
+              {/* <Code borderRadius={8} p={4} width="full" overflow="auto" maxHeight="300px">
+                {typedDataDisplay || (
+                  <Text color="black" fontStyle="italic" size="sm">
+                    {PLACEHOLDER}
+                  </Text>
+                )}
+              </Code> */}
+              <Text mt={2} fontSize="md" color="black">Signed Result:</Text>
               <Code borderRadius={8} p={4} width="full">
                 {result?.signedTypedData || (
-                  <Text color="gray.500" fontStyle="italic" size="sm">
+                  <Text color="black" fontStyle="italic" size="sm">
                     {PLACEHOLDER}
                   </Text>
                 )}
               </Code>
             </Stack>
           </Section>
+
           {/* <Stack title="Call Gasless Contract Method">
             <Button
               onClick={callContractGasless}
