@@ -195,7 +195,8 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
       <CardBody>
         <Heading size="md">Wallet Features</Heading>
         <Divider my={4} />
-          <Stack>
+        <Stack spacing={6}>
+          <Section title="Native Token Balance">
             <Button
               onClick={fetchBalance}
               colorScheme="purple"
@@ -204,86 +205,99 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
               Fetch Balance
             </Button>
             <Text fontSize="xl" color="black">{balance ? `${balance} MATIC` : "Balance not fetched"}</Text>
-          <Stack>
-            <Button
-              onClick={getAddress}
-              colorScheme="purple"
-              isLoading={loading === Features.GET_WALLET}
-            >
-              Get Wallet Address
-            </Button>
-            <Code borderRadius={8} p={4}>
-              {result?.wallet ? (
-                <Link
-                  isExternal
-                  textDecoration="underline"
-                  href={`https://mumbai.polygonscan.com/address/${result.wallet}`}
-                >
-                  {result.wallet}
-                </Link>
-              ) : (
-                <Text color="gray.500" fontStyle="italic" size="sm">
-                  {PLACEHOLDER}
-                </Text>
-              )}
-            </Code>
-          </Stack>
-          <Stack title="Transfer Native Token">
-            <Input
-              color="black"
-              placeholder="Recipient Address"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-            />
-            <Input
-              mt={2}
-              color="black"
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-            <Button
-              mt={2}
-              onClick={sendNativeToken}
-              colorScheme="purple"
-              isLoading={loading === Features.SEND_NATIVE_TOKEN}
-            >
-              Send
-            </Button>
-            <Text mt={2} fontSize="md" color="black">{txStatus}</Text>
-          </Stack>
-          <Stack>
-            <Button
-              onClick={signMessage}
-              colorScheme="purple"
-              isLoading={loading === Features.SIGN_MESSAGE}
-            >
-              Sign Message
-            </Button>
-            <Code borderRadius={8} p={4} width="full">
-              {result?.signedMessage || (
-                <Text color="gray.500" fontStyle="italic" size="sm">
-                  {PLACEHOLDER}
-                </Text>
-              )}
-            </Code>
-          </Stack>
-          <Stack>
-            <Button
-              onClick={signTypedDataV4}
-              colorScheme="purple"
-              isLoading={loading === Features.SIGN_TYPED_DATA}
-            >
-              Sign Type Data (EIP712)
-            </Button>
-            <Code borderRadius={8} p={4} width="full">
-              {result?.signedTypedData || (
-                <Text color="gray.500" fontStyle="italic" size="sm">
-                  {PLACEHOLDER}
-                </Text>
-              )}
-            </Code>
-          </Stack>
+          </Section>
+
+          <Section title="Wallet Address">
+            <Stack>
+              <Button
+                onClick={getAddress}
+                colorScheme="purple"
+                isLoading={loading === Features.GET_WALLET}
+              >
+                Get Wallet Address
+              </Button>
+              <Code borderRadius={8} p={4}>
+                {result?.wallet ? (
+                  <Link
+                    isExternal
+                    textDecoration="underline"
+                    href={`https://mumbai.polygonscan.com/address/${result.wallet}`}
+                  >
+                    {result.wallet}
+                  </Link>
+                ) : (
+                  <Text color="gray.500" fontStyle="italic" size="sm">
+                    {PLACEHOLDER}
+                  </Text>
+                )}
+              </Code>
+            </Stack>
+          </Section>
+
+          <Section title="Transfer Native Token">
+            <Stack>
+              <Input
+                color="black"
+                placeholder="Recipient Address"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+              />
+              <Input
+                mt={2}
+                color="black"
+                placeholder="Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <Button
+                mt={2}
+                onClick={sendNativeToken}
+                colorScheme="purple"
+                isLoading={loading === Features.SEND_NATIVE_TOKEN}
+              >
+                Send
+              </Button>
+              <Text mt={2} fontSize="md" color="black">{txStatus}</Text>
+            </Stack>
+          </Section>
+
+          <Section title="Sign Message">
+            <Stack>
+              <Button
+                onClick={signMessage}
+                colorScheme="purple"
+                isLoading={loading === Features.SIGN_MESSAGE}
+              >
+                Sign Message
+              </Button>
+              <Code borderRadius={8} p={4} width="full">
+                {result?.signedMessage || (
+                  <Text color="gray.500" fontStyle="italic" size="sm">
+                    {PLACEHOLDER}
+                  </Text>
+                )}
+              </Code>
+            </Stack>
+          </Section>
+
+          <Section title="Sign Typed Data (EIP712)">
+            <Stack>
+              <Button
+                onClick={signTypedDataV4}
+                colorScheme="purple"
+                isLoading={loading === Features.SIGN_TYPED_DATA}
+              >
+                Sign Type Data (EIP712)
+              </Button>
+              <Code borderRadius={8} p={4} width="full">
+                {result?.signedTypedData || (
+                  <Text color="gray.500" fontStyle="italic" size="sm">
+                    {PLACEHOLDER}
+                  </Text>
+                )}
+              </Code>
+            </Stack>
+          </Section>
           {/* <Stack title="Call Gasless Contract Method">
             <Button
               onClick={callContractGasless}
@@ -295,26 +309,28 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
             <LinkDisplay value={result?.gaslessTransactionHash} urlBase="https://mumbai.polygonscan.com/tx/" />
           </Stack> */}
 
-          <Stack title="Export Private Key">
+          <Section title="Export Private Key">
+            <Stack>
 
-            <Button onClick={onOpen} colorScheme="purple" mt={4}>
-              Export Account
-            </Button>
-            <Modal isOpen={isOpen} onClose={onClose} size="xl">
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>Export Account</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <iframe
-                    src='https://withpaper.com/sdk/2022-08-12/embedded-wallet/export?clientId=8e0e99fe-933e-4ff8-a2f7-5c7439196c15'
-                    width="525px"
-                    height="475px"
-                  />
-                </ModalBody>
-              </ModalContent>
-            </Modal>
-          </Stack>
+              <Button onClick={onOpen} colorScheme="purple" mt={4}>
+                Export Account
+              </Button>
+              <Modal isOpen={isOpen} onClose={onClose} size="xl">
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Export Account</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <iframe
+                      src='https://withpaper.com/sdk/2022-08-12/embedded-wallet/export?clientId=8e0e99fe-933e-4ff8-a2f7-5c7439196c15'
+                      width="525px"
+                      height="475px"
+                    />
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
+            </Stack>
+          </Section>
         </Stack>
       </CardBody>
     </Card>
