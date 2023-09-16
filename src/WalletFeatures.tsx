@@ -225,13 +225,13 @@ export const WalletFeatures: React.FC<Props> = ({ user }) => {
         <Divider my={4} />
         <Stack spacing={6}>
           <Section title="Native Token Balance">
-            <Button
+            {/* <Button
               onClick={fetchBalance}
               colorScheme="purple"
               isLoading={loading === Features.FETCH_BALANCE}
             >
               Fetch Balance
-            </Button>
+            </Button> */}
             <Text fontSize="xl" color="black">{balance ? `${balance} MATIC` : "Balance not fetched"}</Text>
           </Section>
 
